@@ -28,8 +28,10 @@ namespace Internal.Scripts.Core.Utils
             return formattedMessage;
 #endif
             
+#pragma warning disable CS0162 // Unreachable code detected
             // prevents error in build
             return string.Empty;
+#pragma warning restore CS0162 // Unreachable code detected
         }
     }
 }
