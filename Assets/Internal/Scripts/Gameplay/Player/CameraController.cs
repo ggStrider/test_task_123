@@ -1,26 +1,35 @@
 using Internal.Scripts.Core.Extensions;
 using Internal.Scripts.Core.Utils;
+using Internal.Scripts.Installers;
 using UnityEngine;
+using Zenject;
 
 namespace Internal.Scripts.Gameplay.Player
 {
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] private Camera _camera;
         [SerializeField] private Transform _followTarget;
         [SerializeField] private float _followSpeed = 10f;
 
         // getting transform is taking some resources, because its using bridging
         // so its better to cache this variable before accessing in update methods
         private Transform _cameraTransform;
+        private Camera _camera;
 
         private float _maxReachedVerticalPosition = float.NegativeInfinity;
+
+        [Inject]
+        private void Construct(Camera playerCamera)
+        {
+            _camera = playerCamera;
+        }
 
         private void Awake()
         {
             if (_camera == null)
             {
-                CustomDebugger.LogError(this, "No camera attached!", gameObject);
+                CustomDebugger.LogError(this, "No camera attached! " +
+                                              $"Did you forget to add {nameof(PlayerInstaller)}?", gameObject);
                 return;
             }
 

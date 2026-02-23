@@ -8,6 +8,7 @@ namespace Internal.Scripts.Installers
     public class PlayerInstaller : MonoInstaller
     {
         [SerializeField] private PlayerConfiguration _playerConfiguration;
+        [SerializeField] private Camera _playerCamera;
         
         public override void InstallBindings()
         {
@@ -17,6 +18,11 @@ namespace Internal.Scripts.Installers
             
             Container.Bind<PlayerConfiguration>()
                 .FromScriptableObject(_playerConfiguration)
+                .AsSingle()
+                .NonLazy();
+
+            Container.Bind<Camera>()
+                .FromInstance(_playerCamera)
                 .AsSingle()
                 .NonLazy();
         }
