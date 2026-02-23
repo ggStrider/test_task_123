@@ -1,4 +1,5 @@
 using Internal.Data.Player;
+using Internal.Scripts.Core.Inputs;
 using Internal.Scripts.Core.Utils;
 using Internal.Scripts.Gameplay.Collisions;
 using NaughtyAttributes;
@@ -8,18 +9,20 @@ using Zenject;
 namespace Internal.Scripts.Gameplay.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class DoodleJumper : MonoBehaviour
+    public class DoodleController : MonoBehaviour
     {
         [SerializeField] private TriggerLayerTouchingChecker _groundChecker;
+        
         private Rigidbody2D _rigidbody;
-
         private PlayerConfiguration _playerConfiguration;
-
+        private InputReader _inputReader;
+        
         private float _jumpForce => _playerConfiguration.JumpForce;
 
         [Inject]
-        private void Construct(PlayerConfiguration playerConfiguration)
+        private void Construct(PlayerConfiguration playerConfiguration, InputReader inputReader)
         {
+            _inputReader = inputReader;
             _playerConfiguration = playerConfiguration;
         }
 
@@ -46,7 +49,18 @@ namespace Internal.Scripts.Gameplay.Player
         private void FixedUpdate()
         {
             HandleGravity();
+            Move();
             TryJump();
+        }
+
+        private void Move()
+        {
+            var tilt = _inputReader.Tilt.x;
+            if (tilt != 0)
+            {
+                _rigidbody.AddForceX(_inputReader.Tilt.x * _playerConfiguration.MovementSensitivity,
+                    ForceMode2D.Force);
+            }
         }
 
         private void HandleGravity()
@@ -70,7 +84,7 @@ namespace Internal.Scripts.Gameplay.Player
                 return;
            
             _rigidbody.linearVelocityY = 0;
-            _rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+            _rigidbody.AddForceY(_jumpForce, ForceMode2D.Impulse);
         }
 
         private bool IsStillInJump()
