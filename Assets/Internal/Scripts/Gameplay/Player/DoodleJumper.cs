@@ -45,7 +45,20 @@ namespace Internal.Scripts.Gameplay.Player
 
         private void FixedUpdate()
         {
+            HandleGravity();
             TryJump();
+        }
+
+        private void HandleGravity()
+        {
+            if (IsFalling())
+            {
+                _rigidbody.gravityScale = _playerConfiguration.FallingGravity;
+            }
+            else
+            {
+                _rigidbody.gravityScale = _playerConfiguration.OnJumpGravity;
+            }
         }
 
         private void TryJump()
@@ -53,8 +66,22 @@ namespace Internal.Scripts.Gameplay.Player
             if (!_groundChecker.IsTouchingLayer)
                 return;
 
+            if (IsStillInJump())
+                return;
+           
             _rigidbody.linearVelocityY = 0;
             _rigidbody.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+        }
+
+        private bool IsStillInJump()
+        {
+            const float minIsJumpingVerticalVelocity = 0.1f;
+            return _rigidbody.linearVelocityY >= minIsJumpingVerticalVelocity;
+        }
+
+        private bool IsFalling()
+        {
+            return _rigidbody.linearVelocityY < 0f;
         }
 
 #if UNITY_EDITOR
@@ -69,20 +96,21 @@ namespace Internal.Scripts.Gameplay.Player
         {
             if (!_drawMaxHeightGizmos)
                 return;
-            
-            if (_playerConfiguration == null && _configToCalculateGizmos == null)
-                return;
 
-            var rb = _rigidbody != null ? _rigidbody : GetComponent<Rigidbody2D>();
+            var rb = GetComponent<Rigidbody2D>();
             if (rb == null)
                 return;
 
-            var config = _playerConfiguration != null ? _playerConfiguration : _configToCalculateGizmos;
+            var config = Application.isPlaying
+                ? _playerConfiguration
+                : _configToCalculateGizmos;
+
             if (config == null)
                 return;
 
             var jumpVelocity = config.JumpForce / rb.mass;
-            var gravity = Mathf.Abs(Physics2D.gravity.y * rb.gravityScale);
+            var gravity = Mathf.Abs(Physics2D.gravity.y * config.OnJumpGravity);
+
             var maxHeight = (jumpVelocity * jumpVelocity) / (2f * gravity);
 
             var startPos = transform.position;
