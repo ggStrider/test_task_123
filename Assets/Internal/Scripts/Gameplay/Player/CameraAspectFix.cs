@@ -1,20 +1,14 @@
 using NaughtyAttributes;
 using UnityEngine;
-using Zenject;
 
 namespace Internal.Scripts.Gameplay.Player
 {
+    [RequireComponent(typeof(Camera))]
     public class CameraAspectFix : MonoBehaviour
     {
-        [SerializeField] private float aspect = 1.33333f;
+        [SerializeField] private float aspect = 0.462f;
 
         private Camera _camera;
-
-        [Inject]
-        private void Construct(Camera playerCamera)
-        {
-            _camera = playerCamera;
-        }
 
         private void Start()
         {

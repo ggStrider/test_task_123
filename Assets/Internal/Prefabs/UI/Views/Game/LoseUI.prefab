@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 6946859141372624808}
   - component: {fileID: 48341289055960305}
   - component: {fileID: 6382645045299643651}
+  - component: {fileID: 3894310904753868620}
   m_Layer: 0
   m_Name: PlayAgain
   m_TagString: Untagged
@@ -209,6 +210,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Button: {fileID: 48341289055960305}
+--- !u!114 &3894310904753868620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3634372903693172984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0c56f5646554d47a0a14dba6e58ada5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Button: {fileID: 48341289055960305}
 --- !u!1 &3842173441975684084
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,6 +273,7 @@ GameObject:
   - component: {fileID: 2319950667570750446}
   - component: {fileID: 6192331943543330403}
   - component: {fileID: 2404017591314442209}
+  - component: {fileID: 2275304726704235106}
   m_Layer: 0
   m_Name: backButton
   m_TagString: Untagged
@@ -381,6 +396,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Button: {fileID: 6192331943543330403}
   _sceneCardToLoad: {fileID: 11400000, guid: 75964ffc73dc873f9b23504e8a03fd13, type: 2}
+--- !u!114 &2275304726704235106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6052659480153646482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0c56f5646554d47a0a14dba6e58ada5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Button: {fileID: 6192331943543330403}
 --- !u!1 &6414627711104703705
 GameObject:
   m_ObjectHideFlags: 0
