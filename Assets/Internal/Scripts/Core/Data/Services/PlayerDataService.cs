@@ -28,6 +28,9 @@ namespace Internal.Scripts.Core.Data.Services
 
         public bool TryChangeCurrentLevelScore(float newLevelScore)
         {
+            if (newLevelScore <= 0)
+                return false;
+            
             if (_playerData.CurrentLevelScore.Value < newLevelScore)
             {
                 _playerData.CurrentLevelScore.Value = (int)newLevelScore;
