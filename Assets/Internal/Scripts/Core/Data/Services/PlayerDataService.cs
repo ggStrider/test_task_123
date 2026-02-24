@@ -44,7 +44,6 @@ namespace Internal.Scripts.Core.Data.Services
             {
                 var record = CreateRecordFrom(scoreValue: thisLevelScore);
                 _playerData.Records.Add(record);
-                _playerData.Records.Sort();
 
                 return true;
             }

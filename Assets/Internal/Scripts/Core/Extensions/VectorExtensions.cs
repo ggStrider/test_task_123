@@ -9,5 +9,11 @@ namespace Internal.Scripts.Core.Extensions
             source.y = newY;
             return source;
         }
+
+        public static Vector3 WithZ(this Vector3 source, float z)
+        {
+            source.z = 0;
+            return source;
+        }
     }
 }
