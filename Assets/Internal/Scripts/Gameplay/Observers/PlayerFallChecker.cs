@@ -17,6 +17,8 @@ namespace Internal.Scripts.Gameplay.Observers
         private SignalBus _signalBus;
 
         private bool _fell;
+
+        private bool _initialized;
         
         [Inject]
         private void Construct(Camera playerCamera, PlayerDoodleController doodleController, SignalBus signalBus)
@@ -29,8 +31,16 @@ namespace Internal.Scripts.Gameplay.Observers
             _signalBus = signalBus;
         }
 
+        public void Initialize()
+        {
+            _initialized = true;
+        }
+
         public void LateUpdate()
         {
+            if (!_initialized)
+                return;
+            
             if (_fell)
             {
                 enabled = false; // no sense to use lifecycle again after player fell

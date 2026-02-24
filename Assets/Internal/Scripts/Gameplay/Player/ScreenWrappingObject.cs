@@ -21,12 +21,7 @@ namespace Internal.Scripts.Gameplay.Player
             _camera = playerCamera;
         }
 
-        private void Start()
-        {
-            Setup();
-        }
-
-        private void Setup()
+        public void Initialize()
         {
             _transform = transform;
             

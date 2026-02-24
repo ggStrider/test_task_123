@@ -31,7 +31,7 @@ namespace Internal.Scripts.Gameplay.Player
             _signalBus = signalBus;
         }
 
-        private void Awake()
+        public void Initialize()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             _signalBus.Subscribe<PlayerLoseSignal>(OnPlayerFell);

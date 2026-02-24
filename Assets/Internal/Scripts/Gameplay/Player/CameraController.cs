@@ -18,6 +18,8 @@ namespace Internal.Scripts.Gameplay.Player
 
         private float _maxReachedVerticalPosition = float.NegativeInfinity;
 
+        private bool _initialized;
+        
         [Inject]
         private void Construct(Camera playerCamera)
         {
@@ -36,8 +38,16 @@ namespace Internal.Scripts.Gameplay.Player
             _cameraTransform = _camera.transform;
         }
 
+        public void Initialize()
+        {
+            _initialized = true;
+        }
+
         private void LateUpdate()
         {
+            if (!_initialized) 
+                return;
+            
             TryUpdateCameraPosition();
         }
 
@@ -51,7 +61,7 @@ namespace Internal.Scripts.Gameplay.Player
 
             var interpolateT = Time.deltaTime * _followSpeed;
             var nextPosition = GetNextPosition();
-            _camera.transform.position = Vector3.Lerp(_cameraTransform.position, nextPosition, interpolateT);
+            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, nextPosition, interpolateT);
         }
 
         private Vector3 GetNextPosition()

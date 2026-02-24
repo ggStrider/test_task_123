@@ -11,6 +11,7 @@ namespace Internal.Scripts.Installers
         [SerializeField] private PlayerConfiguration _playerConfiguration;
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private PlayerDoodleController _playerDoodleController;
+        [SerializeField] private CameraController _cameraController;
         
         public override void InstallBindings()
         {
@@ -30,6 +31,11 @@ namespace Internal.Scripts.Installers
 
             Container.Bind<PlayerDoodleController>()
                 .FromInstance(_playerDoodleController)
+                .AsSingle()
+                .NonLazy();
+
+            Container.Bind<CameraController>()
+                .FromInstance(_cameraController)
                 .AsSingle()
                 .NonLazy();
         }
