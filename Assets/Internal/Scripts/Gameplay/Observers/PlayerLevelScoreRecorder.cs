@@ -41,8 +41,6 @@ namespace Internal.Scripts.Gameplay.Observers
 
         private void StartRecording()
         {
-            _playerDataService.ResetCurrentLevelHighScore();
-            
             _recordingCts = new();
             TryRecord(_recordingCts.Token).Forget();
         }

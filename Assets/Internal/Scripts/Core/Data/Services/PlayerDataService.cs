@@ -13,7 +13,7 @@ namespace Internal.Scripts.Core.Data.Services
         public IReadOnlyList<GameHighScoreRecord> Records => _playerData.Records.AsReadOnly();
         
         // imo needs also to be readonly value
-        public ReactiveVariable<int> CurrentLevelScore => _playerData.CurrentLevelMaxHigh;
+        public ReactiveVariable<int> CurrentLevelScore => _playerData.CurrentLevelScore;
 
         [Inject]
         public PlayerDataService(PlayerData playerData)
@@ -23,23 +23,23 @@ namespace Internal.Scripts.Core.Data.Services
 
         public void ResetCurrentLevelHighScore()
         {
-            _playerData.CurrentLevelMaxHigh.Value = 0;
+            _playerData.CurrentLevelScore.Value = 0;
         }
 
-        public bool TryChangeCurrentLevelScore(float currentLevelScore)
+        public bool TryChangeCurrentLevelScore(float newLevelScore)
         {
-            if (_playerData.CurrentLevelMaxHigh.Value >= currentLevelScore)
+            if (_playerData.CurrentLevelScore.Value < newLevelScore)
             {
-                _playerData.CurrentLevelMaxHigh.Value = (int)currentLevelScore;
-                return false;
+                _playerData.CurrentLevelScore.Value = (int)newLevelScore;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         public bool TryAddToRecordsCurrentLevelScore()
         {
-            var thisLevelScore = _playerData.CurrentLevelMaxHigh.Value;
+            var thisLevelScore = _playerData.CurrentLevelScore.Value;
             if (thisLevelScore > 0 && !IsPlayerDataContainsThisScore(thisLevelScore))
             {
                 var record = CreateRecordFrom(scoreValue: thisLevelScore);

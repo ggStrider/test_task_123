@@ -6,7 +6,7 @@ namespace Internal.Scripts.Core.Data
 {
     public class PlayerData
     {
-        public ReactiveVariable<int> CurrentLevelMaxHigh = new(0);
+        public ReactiveVariable<int> CurrentLevelScore = new(0);
         public List<GameHighScoreRecord> Records = new();
     }
 
