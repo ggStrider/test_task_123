@@ -2,6 +2,7 @@ using Internal.Data.Player;
 using Internal.Scripts.Core.Inputs;
 using Internal.Scripts.Core.Utils;
 using Internal.Scripts.Gameplay.Collisions;
+using Internal.Scripts.Installers.Signals;
 using NaughtyAttributes;
 using UnityEngine;
 using Zenject;
@@ -9,27 +10,48 @@ using Zenject;
 namespace Internal.Scripts.Gameplay.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class DoodleController : MonoBehaviour
+    public class PlayerDoodleController : MonoBehaviour
     {
         [SerializeField] private TriggerLayerTouchingChecker _groundChecker;
         
         private Rigidbody2D _rigidbody;
         private PlayerConfiguration _playerConfiguration;
         private InputReader _inputReader;
+
+        private SignalBus _signalBus;
         
         private float _jumpForce => _playerConfiguration.JumpForce;
 
         [Inject]
-        private void Construct(PlayerConfiguration playerConfiguration, InputReader inputReader)
+        private void Construct(PlayerConfiguration playerConfiguration, InputReader inputReader, SignalBus signalBus)
         {
             _inputReader = inputReader;
             _playerConfiguration = playerConfiguration;
+
+            _signalBus = signalBus;
         }
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
+            _signalBus.Subscribe<PlayerLoseSignal>(OnPlayerFell);
+
+            transform.position = Vector3.zero;
+            
             TryLogNullComponents();
+        }
+
+        private void OnDestroy()
+        {
+            _signalBus.TryUnsubscribe<PlayerLoseSignal>(OnPlayerFell);
+        }
+
+        private void OnPlayerFell()
+        {
+            enabled = false;
+            
+            _rigidbody.gravityScale = 0;
+            _rigidbody.linearVelocity = Vector2.zero;
         }
 
         private void TryLogNullComponents()

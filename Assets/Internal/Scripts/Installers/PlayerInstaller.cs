@@ -1,5 +1,6 @@
 using Internal.Data.Player;
 using Internal.Scripts.Core.Inputs;
+using Internal.Scripts.Gameplay.Player;
 using UnityEngine;
 using Zenject;
 
@@ -9,6 +10,7 @@ namespace Internal.Scripts.Installers
     {
         [SerializeField] private PlayerConfiguration _playerConfiguration;
         [SerializeField] private Camera _playerCamera;
+        [SerializeField] private PlayerDoodleController _playerDoodleController;
         
         public override void InstallBindings()
         {
@@ -23,6 +25,11 @@ namespace Internal.Scripts.Installers
 
             Container.Bind<Camera>()
                 .FromInstance(_playerCamera)
+                .AsSingle()
+                .NonLazy();
+
+            Container.Bind<PlayerDoodleController>()
+                .FromInstance(_playerDoodleController)
                 .AsSingle()
                 .NonLazy();
         }
