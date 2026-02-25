@@ -2,6 +2,7 @@ using System;
 using Internal.Scripts.Core.Data.Services;
 using Internal.Scripts.Gameplay.Observers;
 using Internal.Scripts.Gameplay.Player;
+using Internal.Scripts.Gameplay.UI;
 using UnityEngine;
 using Zenject;
 
@@ -11,6 +12,9 @@ namespace Internal.Scripts.Gameplay
     {
         [SerializeField] private ScreenWrappingObject _playerScreenWrapping;
         [SerializeField] private PlayerFallChecker _playerFallChecker;
+
+        [Space] 
+        [SerializeField] private ScoreHUD _scoreHUD;
         
         private PlayerDoodleController _playerDoodleController;
         private PlayerDataService _playerDataService;
@@ -28,6 +32,7 @@ namespace Internal.Scripts.Gameplay
         private void Awake()
         {
             _playerDataService.ResetCurrentLevelHighScore();
+            _scoreHUD.Initialize();
 
             _playerDoodleController.Initialize();
             _cameraController.Initialize();
