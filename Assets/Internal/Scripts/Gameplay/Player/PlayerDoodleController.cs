@@ -13,13 +13,12 @@ namespace Internal.Scripts.Gameplay.Player
     public class PlayerDoodleController : MonoBehaviour
     {
         [SerializeField] private TriggerLayerTouchingChecker _groundChecker;
-        
+
         private Rigidbody2D _rigidbody;
         private PlayerConfiguration _playerConfiguration;
         private InputReader _inputReader;
-
         private SignalBus _signalBus;
-        
+
         private float _jumpForce => _playerConfiguration.JumpForce;
 
         [Inject]
@@ -27,7 +26,6 @@ namespace Internal.Scripts.Gameplay.Player
         {
             _inputReader = inputReader;
             _playerConfiguration = playerConfiguration;
-
             _signalBus = signalBus;
         }
 
@@ -35,23 +33,9 @@ namespace Internal.Scripts.Gameplay.Player
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             _signalBus.Subscribe<PlayerLoseSignal>(OnPlayerFell);
-
             transform.position = Vector3.zero;
-            
+
             TryLogNullComponents();
-        }
-
-        private void OnDestroy()
-        {
-            _signalBus.TryUnsubscribe<PlayerLoseSignal>(OnPlayerFell);
-        }
-
-        private void OnPlayerFell()
-        {
-            enabled = false;
-            
-            _rigidbody.gravityScale = 0;
-            _rigidbody.linearVelocity = Vector2.zero;
         }
 
         private void TryLogNullComponents()
@@ -68,6 +52,18 @@ namespace Internal.Scripts.Gameplay.Player
             }
         }
 
+        private void OnDestroy()
+        {
+            _signalBus.TryUnsubscribe<PlayerLoseSignal>(OnPlayerFell);
+        }
+
+        private void OnPlayerFell()
+        {
+            enabled = false;
+            _rigidbody.gravityScale = 0;
+            _rigidbody.linearVelocity = Vector2.zero;
+        }
+
         private void FixedUpdate()
         {
             HandleGravity();
@@ -78,75 +74,67 @@ namespace Internal.Scripts.Gameplay.Player
         private void Move()
         {
             var tilt = _inputReader.Tilt.x;
+            var currentVX = _rigidbody.linearVelocityX;
+            var maxSpeed = _playerConfiguration.MaxHorizontalSpeed;
+            var sensitivity = _playerConfiguration.MovementSensitivity;
+
             if (tilt != 0)
             {
-                _rigidbody.AddForceX(_inputReader.Tilt.x * _playerConfiguration.MovementSensitivity,
-                    ForceMode2D.Force);
+                var targetVX = tilt * maxSpeed;
+
+                var isChangingDirection = (tilt > 0 && currentVX < 0) || (tilt < 0 && currentVX > 0);
+                var lerpSpeed = isChangingDirection
+                    ? sensitivity * _playerConfiguration.DirectionChangeFactor
+                    : sensitivity;
+
+                var newVX = Mathf.MoveTowards(currentVX, targetVX, lerpSpeed * Time.fixedDeltaTime);
+                _rigidbody.linearVelocityX = newVX;
+            }
+            else
+            {
+                _rigidbody.linearVelocityX = Mathf.MoveTowards(
+                    currentVX, 0f, _playerConfiguration.HorizontalDamping * Time.fixedDeltaTime);
             }
         }
 
         private void HandleGravity()
         {
-            if (IsFalling())
-            {
-                _rigidbody.gravityScale = _playerConfiguration.FallingGravity;
-            }
-            else
-            {
-                _rigidbody.gravityScale = _playerConfiguration.OnJumpGravity;
-            }
+            _rigidbody.gravityScale = IsFalling()
+                ? _playerConfiguration.FallingGravity
+                : _playerConfiguration.OnJumpGravity;
         }
 
         private void TryJump()
         {
-            if (!_groundChecker.IsTouchingLayer)
+            if (!_groundChecker.IsTouchingLayer || IsStillInJump())
                 return;
 
-            if (IsStillInJump())
-                return;
-           
             _rigidbody.linearVelocityY = 0;
             _rigidbody.AddForceY(_jumpForce, ForceMode2D.Impulse);
         }
 
-        private bool IsStillInJump()
-        {
-            const float minIsJumpingVerticalVelocity = 0.1f;
-            return _rigidbody.linearVelocityY >= minIsJumpingVerticalVelocity;
-        }
-
-        private bool IsFalling()
-        {
-            return _rigidbody.linearVelocityY < 0f;
-        }
+        private bool IsStillInJump() => _rigidbody.linearVelocityY >= 0.1f;
+        private bool IsFalling() => _rigidbody.linearVelocityY < 0f;
 
 #if UNITY_EDITOR
+        [Space(40), Header("Gizmos"), Tooltip("This config works only in edit mode, not in play mode")] [SerializeField]
+        private bool _drawMaxHeightGizmos = true;
 
-        [Space(40), Header("Gizmos"), Tooltip("This config works only in edit mode, not in play mode")] 
-        [SerializeField] private bool _drawMaxHeightGizmos = true;
-        
-        [ShowIf(nameof(_drawMaxHeightGizmos))]
-        [SerializeField] private PlayerConfiguration _configToCalculateGizmos;
+        [ShowIf(nameof(_drawMaxHeightGizmos))] [SerializeField]
+        private PlayerConfiguration _configToCalculateGizmos;
 
         private void OnDrawGizmos()
         {
-            if (!_drawMaxHeightGizmos)
-                return;
+            if (!_drawMaxHeightGizmos) return;
 
             var rb = GetComponent<Rigidbody2D>();
-            if (rb == null)
-                return;
+            if (rb == null) return;
 
-            var config = Application.isPlaying
-                ? _playerConfiguration
-                : _configToCalculateGizmos;
-
-            if (config == null)
-                return;
+            var config = Application.isPlaying ? _playerConfiguration : _configToCalculateGizmos;
+            if (config == null) return;
 
             var jumpVelocity = config.JumpForce / rb.mass;
             var gravity = Mathf.Abs(Physics2D.gravity.y * config.OnJumpGravity);
-
             var maxHeight = (jumpVelocity * jumpVelocity) / (2f * gravity);
 
             var startPos = transform.position;
@@ -155,19 +143,13 @@ namespace Internal.Scripts.Gameplay.Player
             Gizmos.color = Color.green;
             Gizmos.DrawLine(startPos, topPos);
             Gizmos.DrawSphere(topPos, 0.05f);
-
             UnityEditor.Handles.Label(topPos, $"Max Height: {maxHeight:F2}");
         }
 
         private void Reset()
         {
             if (_rigidbody == null)
-            {
-                if (TryGetComponent<Rigidbody2D>(out var rb))
-                {
-                    _rigidbody = rb;
-                }
-            }
+                TryGetComponent(out _rigidbody);
         }
 #endif
     }
