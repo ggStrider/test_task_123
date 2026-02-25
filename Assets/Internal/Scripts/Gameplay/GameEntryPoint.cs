@@ -1,5 +1,6 @@
 using System;
 using Internal.Scripts.Core.Data.Services;
+using Internal.Scripts.Gameplay.Environment.Platforms;
 using Internal.Scripts.Gameplay.Observers;
 using Internal.Scripts.Gameplay.Player;
 using Internal.Scripts.Gameplay.UI;
@@ -12,6 +13,9 @@ namespace Internal.Scripts.Gameplay
     {
         [SerializeField] private ScreenWrappingObject _playerScreenWrapping;
         [SerializeField] private PlayerFallChecker _playerFallChecker;
+
+        [Space]
+        [SerializeField] private PlatformSpawner _platformSpawner;
 
         [Space] 
         [SerializeField] private ScoreHUD _scoreHUD;
@@ -33,6 +37,8 @@ namespace Internal.Scripts.Gameplay
         {
             _playerDataService.ResetCurrentLevelHighScore();
             _scoreHUD.Initialize();
+            
+            _platformSpawner.Initialize();
 
             _playerDoodleController.Initialize();
             _cameraController.Initialize();
