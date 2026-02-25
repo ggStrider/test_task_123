@@ -16,6 +16,7 @@ namespace Internal.Scripts.Gameplay
 
         [Space]
         [SerializeField] private PlatformSpawner _platformSpawner;
+        [SerializeField] private PlayerLevelScoreRecorder _levelScoreRecorder;
 
         [Space] 
         [SerializeField] private ScoreHUD _scoreHUD;
@@ -44,8 +45,9 @@ namespace Internal.Scripts.Gameplay
             _cameraController.Initialize();
             
             _playerScreenWrapping.Initialize();
-            
             _playerFallChecker.Initialize();
+            
+            _levelScoreRecorder.Initialize();
         }
     }
 }

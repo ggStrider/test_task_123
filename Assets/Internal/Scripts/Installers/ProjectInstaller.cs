@@ -3,6 +3,7 @@ using Internal.Scripts.Core.Data.Services;
 using Internal.Scripts.Core.Data.Services.Saves;
 using Internal.Scripts.Core.Scenes;
 using Internal.Scripts.Core.Scenes.LoadingScreens;
+using Internal.Scripts.Gameplay.Environment;
 using UnityEngine;
 using Zenject;
 
@@ -18,16 +19,20 @@ namespace Internal.Scripts.Installers
                 .AsSingle()
                 .NonLazy();
             
-            Container.BindInterfacesAndSelfTo<PlayerDataService>()
+            Container.BindInterfacesAndSelfTo<SaveService>()
                 .AsSingle()
                 .NonLazy();
-
-            Container.BindInterfacesAndSelfTo<SaveService>()
+            
+            Container.BindInterfacesAndSelfTo<PlayerDataService>()
                 .AsSingle()
                 .NonLazy();
 
             Container.Bind<SceneLoader>()
                 .FromMethod(CreateSceneLoader)
+                .AsSingle()
+                .NonLazy();
+
+            Container.Bind<TimeManager>()
                 .AsSingle()
                 .NonLazy();
         }

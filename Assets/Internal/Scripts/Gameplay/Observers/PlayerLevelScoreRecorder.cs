@@ -28,7 +28,7 @@ namespace Internal.Scripts.Gameplay.Observers
             _playerTransform = playerDoodleController.transform;
         }
 
-        private void Awake()
+        public void Initialize()
         {
             _signalBus.Subscribe<PlayerLoseSignal>(StopRecording);
             StartRecording();
