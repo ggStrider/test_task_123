@@ -1,24 +1,30 @@
 using System;
 using System.Collections.Generic;
+using Internal.Scripts.Core.Data.Services.Saves;
 using Internal.Scripts.Core.Reactive;
 using UnityEngine;
 using Zenject;
 
 namespace Internal.Scripts.Core.Data.Services
 {
-    public class PlayerDataService : IPlayerDataService
+    public class PlayerDataService : IPlayerDataService, IInitializable
     {
         private readonly PlayerData _playerData;
+        private readonly ISaveService _saveService;
 
         public IReadOnlyList<GameHighScoreRecord> Records => _playerData.Records.AsReadOnly();
-        
-        // imo needs also to be readonly value
         public ReactiveVariable<int> CurrentLevelScore => _playerData.CurrentLevelScore;
 
         [Inject]
-        public PlayerDataService(PlayerData playerData)
+        public PlayerDataService(PlayerData playerData, ISaveService saveService)
         {
             _playerData = playerData;
+            _saveService = saveService;
+        }
+
+        public void Initialize()
+        {
+            _saveService.Load(_playerData);
         }
 
         public void ResetCurrentLevelHighScore()
@@ -30,7 +36,7 @@ namespace Internal.Scripts.Core.Data.Services
         {
             if (newLevelScore <= 0)
                 return false;
-            
+
             if (_playerData.CurrentLevelScore.Value < newLevelScore)
             {
                 _playerData.CurrentLevelScore.Value = (int)newLevelScore;
@@ -43,27 +49,18 @@ namespace Internal.Scripts.Core.Data.Services
         public bool TryAddToRecordsCurrentLevelScore()
         {
             var thisLevelScore = _playerData.CurrentLevelScore.Value;
-            if (thisLevelScore > 0 && !IsPlayerDataContainsThisScore(thisLevelScore))
-            {
-                var record = CreateRecordFrom(scoreValue: thisLevelScore);
-                _playerData.Records.Add(record);
+            if (thisLevelScore <= 0 || IsPlayerDataContainsThisScore(thisLevelScore))
+                return false;
 
-                return true;
-            }
-
-            return false;
+            _playerData.Records.Add(CreateRecordFrom(thisLevelScore));
+            _saveService.Save(_playerData);
+            return true;
         }
 
         #region Help tools
 
-        private GameHighScoreRecord CreateRecordFrom(int scoreValue)
-        {
-            var record = new GameHighScoreRecord(
-                score: scoreValue,
-                whenScoreWasAchieved: DateTime.Today);
-
-            return record;
-        }
+        private GameHighScoreRecord CreateRecordFrom(int scoreValue) =>
+            new(score: scoreValue, whenScoreWasAchieved: DateTime.Today);
 
         private bool IsPlayerDataContainsThisScore(float scoreToCheck)
         {
@@ -72,7 +69,6 @@ namespace Internal.Scripts.Core.Data.Services
                 if (Mathf.Approximately(record.Score, scoreToCheck))
                     return true;
             }
-
             return false;
         }
 

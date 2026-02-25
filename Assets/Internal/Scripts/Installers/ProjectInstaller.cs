@@ -1,5 +1,6 @@
 using Internal.Scripts.Core.Data;
 using Internal.Scripts.Core.Data.Services;
+using Internal.Scripts.Core.Data.Services.Saves;
 using Internal.Scripts.Core.Scenes;
 using Internal.Scripts.Core.Scenes.LoadingScreens;
 using UnityEngine;
@@ -18,6 +19,10 @@ namespace Internal.Scripts.Installers
                 .NonLazy();
             
             Container.BindInterfacesAndSelfTo<PlayerDataService>()
+                .AsSingle()
+                .NonLazy();
+
+            Container.BindInterfacesAndSelfTo<SaveService>()
                 .AsSingle()
                 .NonLazy();
 
